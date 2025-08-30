@@ -34,7 +34,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             });
-            return issuesJson.toString();
+            return issuesJson.data;
       - name: Print issues
         run: |
           issues='${{steps.get-github-issues.outputs.result}}'
