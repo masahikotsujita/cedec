@@ -24,6 +24,23 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get latest cedec session list
         run: curl -O "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json"
+      - name: Get github issue list
+        id: get-github-issues
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          script: |
+            github.rest.issues.get({
+              per_page: 100,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+      - name: Print issues
+        run: |
+          issues='${{steps.get-github-issues.outputs.result}}'
+          echo "$issues"
       - name: Print cedec session list
         run: |
           TAB=$(printf '\t')
