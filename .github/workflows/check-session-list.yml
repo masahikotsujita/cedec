@@ -41,7 +41,7 @@ jobs:
         run: |
           TAB=$(printf '\t')
           jq -r '.[] | [.start, .end, .format, .title, .category, .difficulty, .duration, .description, .photo_ok, .sns_ok, .CEDIL, .URL] | @tsv' cedec_schedule.json | {
-            while IFS="$TAB" read -r start end format title category difficulty duration description photo_ok sns_ok CEDIL URL; do
-              printf "start: %s end: %s format: %s title: %s category: %s difficulty: %s duration: %d時間 写真撮影:%s SNS投稿: %s CEDIL公開: %s URL: %s\n" "$start" "$end" "$format" "$title" "$category" "$difficulty" "$duration" "$photo_ok" "$sns_ok" "$CEDIL" "$URL"
+            while IFS="$TAB" read -r start end format title; do
+              printf "start: %s end: %s format: %s title: %s\n" "$start" "$end" "$format" "$title"
             done
           }
