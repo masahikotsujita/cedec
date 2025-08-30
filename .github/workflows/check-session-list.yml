@@ -26,7 +26,9 @@ jobs:
         run: curl -O "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json"
       - name: Print cedec session list
         run: |
-          for item in $(jq -c '.[]' cedec_schedule.json); do
-            title=$(echo "$item" | jq -r '.title')
-            echo $title
-          done
+          TAB=$(printf '\t')
+          jq -r '.[] | [.title] | @tsv' cedec_schedule.json | {
+            while IFS="$TAB" read -r title; do
+              printf "title: %s\n" "$title"
+            done
+          }
