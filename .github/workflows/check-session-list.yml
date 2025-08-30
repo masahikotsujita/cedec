@@ -4,6 +4,7 @@ name: CI
 
 # Controls when the workflow will run
 on:
+  push:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   schedule:
     - cron: "0 3 * * *"  # UTC時間で毎日3時に実行
