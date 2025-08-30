@@ -30,7 +30,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            github.rest.issues.get({
+            github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo
             })
