@@ -37,8 +37,7 @@ jobs:
             return issuesJson.data;
       - name: Print issues
         run: |
-          issues='${{steps.get-github-issues.outputs.result}}'
-          echo "$issues"
+          echo '${{ steps.issues.get-github-issues.result }}' | jq .
       - name: Print cedec session list
         run: |
           TAB=$(printf '\t')
