@@ -33,9 +33,8 @@ jobs:
           retry-exempt-status-codes: 400,401
           script: |
             github.rest.issues.get({
-              per_page: 100,
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo: context.repo.repo
             })
       - name: Print issues
         run: |
