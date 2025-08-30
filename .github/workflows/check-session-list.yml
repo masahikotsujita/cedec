@@ -1,0 +1,31 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  schedule:
+    - cron: "0 3 * * *"  # UTC時間で毎日3時に実行
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - name: Get latest cedec session list
+        run: curl -O "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json"
+      - name: Print cedec session list
+        run: |
+          for item in $(jq -c '.[]' cedec_schedule.json); do
+            title=$(echo "$item" | jq -r '.title')
+            echo $title
+          done
