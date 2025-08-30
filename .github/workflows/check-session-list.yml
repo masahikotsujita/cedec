@@ -30,10 +30,11 @@ jobs:
         with:
           result-encoding: string
           script: |
-            github.rest.issues.listForRepo({
+            const issuesJson = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo
-            })
+            });
+            return issuesJson.toString();
       - name: Print issues
         run: |
           issues='${{steps.get-github-issues.outputs.result}}'
