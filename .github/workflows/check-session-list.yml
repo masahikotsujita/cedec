@@ -28,9 +28,41 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const issues_response = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            const issues = issues.response.data;
+            const issue_titles = issues.map((issue_json) => {
+              return issue_json.title;
+            });
+            for (const issue_title of issue_titles) {
+              console.log(issue_title);
+            }
             const cedec_schedule_url = "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json";
             const cedec_schedule_response = await fetch(cedec_schedule_url);
             const sessions = await cedec_schedule_response.json();
+            var flag = false;
             for (const session of sessions) {
-              console.log(session.title);
+              if (issues_titles.includes(session.title)) {
+                console.log(`セッション${session.title}のissueは既にあるのでスキップ.`);
+              } else {
+                if (flag) {
+                  console.log(`セッション${session.title}のissueは無いですが、大量作成防止フラグが立ってるのでスキップ。`);
+                } else {
+                  console.log(`セッション${session.title}のissueを作成します。`);
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: `[テスト]${session.title}`,
+                    body: `タイトル: ${session.title}
+                    URL: ${session.url}
+                    開始時刻: ${session.start}
+                    終了時刻: ${session.end}
+                    登壇者: ${session.speakers.map((speaker) => `${speaker.name}(${speaker.company})`).join()}`
+                  });
+                  flag = true;
+                }
+              }
             }
