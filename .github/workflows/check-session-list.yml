@@ -31,12 +31,14 @@ jobs:
           script: |
             const issuesJson = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
+              state: 'open'
             });
             return issuesJson.data;
-      - name: Print issues
+      - name: Convert issue list to titles
         run: |
-          echo '${{ steps.get-github-issues.outputs.result }}' | jq .
+          titles=($(echo '${{ steps.get-github-issues.outputs.result }}' | jq -r '.[].title'))
+          echo "${titles[@]}"
       - name: Print cedec session list
         run: |
           TAB=$(printf '\t')
