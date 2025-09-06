@@ -26,52 +26,63 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const issues_response = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open'
-            });
-            const issues = issues_response.data;
+            // open状態のissue全件取得。
+            const issues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100
+              }
+            );
+            // 作成済issueチェック用のタイトル配列。
+            // ID等ではなくタイトル文字列一致なのが微妙だけどとりあえず暫定。
             const issue_titles = issues.map((issue_json) => {
               return issue_json.title;
             });
+            // CEDECスケジュール取得。
             const cedec_schedule_url = "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json";
             const cedec_schedule_response = await fetch(cedec_schedule_url);
             const sessions = await cedec_schedule_response.json();
+            // 頻度制限に引っかかるのでとりあえず1度に10個まで。
+            var create_issue_count = 0;
+            // セッションに対応するissueを一括作成。
             for (const session of sessions) {
               if (issue_titles.includes(session.title)) {
                 console.log(`セッション${session.title}のissueは既にあるのでスキップ.`);
               } else {
-                console.log(`セッション${session.title}のissueを作成します。`);
-                var date_desc;
-                var date_label_simple;
-                var date_label_detail;
-                if (session.start == "") {
-                  date_desc = "-";
-                  date_label_simple = null;
-                  date_label_detail = null;
-                } else {
-                  date_desc = `${session.start} ～ ${session.end.split(" ")[1]}`;
-                  date_label_detail = session.start.split(" ")[0];
-                  switch (session.start.split(" ")[0]) {
-                  case "2025/07/22":
-                    date_label_simple = "1日目";
-                    break;
-                  case "2025/07/23":
-                    date_label_simple = "2日目";
-                    break;
-                  case "2025/07/24":
-                    date_label_simple = "3日目";
-                    break;
-                  default:
-                    console.log(`unexpected schedule. start=${session.start} end=${session.end}`);
+                if (create_issue_count < 10) {
+                  console.log(`セッション${session.title}のissueを作成します。`);
+                  var date_desc;
+                  var date_label_simple;
+                  var date_label_detail;
+                  if (session.start == "") {
+                    date_desc = "-";
+                    date_label_simple = null;
+                    date_label_detail = null;
+                  } else {
+                    date_desc = `${session.start} ～ ${session.end.split(" ")[1]}`;
+                    date_label_detail = session.start.split(" ")[0];
+                    switch (session.start.split(" ")[0]) {
+                    case "2025/07/22":
+                      date_label_simple = "1日目";
+                      break;
+                    case "2025/07/23":
+                      date_label_simple = "2日目";
+                      break;
+                    case "2025/07/24":
+                      date_label_simple = "3日目";
+                      break;
+                    default:
+                      console.log(`unexpected schedule. start=${session.start} end=${session.end}`);
+                    }
                   }
-                }
-                await github.rest.issues.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title: `${session.title}`,
-                  body: `## セッション情報
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: `${session.title}`,
+                    body: `## セッション情報
             | 項目 | 値 |
             |:------|:------|
             | 日時 | ${date_desc} |
@@ -87,10 +98,14 @@ jobs:
             
             ## 参加ガイドライン
             - このセッションに参加するにはリアクションしてください
-              - 現地で参加したい人は、:rocket:でリアクションしてください
-              - 家で参加したい人は、:eyes:でリアクションしてください
-              - 誰かに見て欲しい場合は、:heart:でリアクションしてください`,
-                labels: [ "automation", date_label_simple, date_label_detail, session.format, session.category, session.photo_ok ? "写真撮影可" : "写真撮影不可", session.sns_ok ? "SNS投稿可" : "SNS投稿不可", session.CEDIL ? "CEDIL公開予定あり" : "CEDIL公開予定なし" ].filter(v => v != null)
-                });
+              - 現地で参加したい人は、 :rocket: でリアクションしてください
+              - 家で参加したい人は、 :eyes: でリアクションしてください
+              - 誰かに見て欲しい場合は、 :heart: でリアクションしてください`,
+                  labels: [ "automation", date_label_simple, date_label_detail, session.format, session.category, session.photo_ok ? "写真撮影可" : "写真撮影不可", session.sns_ok ? "SNS投稿可" : "SNS投稿不可", session.CEDIL ? "CEDIL公開予定あり" : "CEDIL公開予定なし" ].filter(v => v != null)
+                  });
+                  issue_create_count += 1;
+                } else {
+                  console.log(`セッション${session.title}のissueは未作成ですが、1回の作成上限を超えたのでスキップします。`);
+                }
               }
             }
