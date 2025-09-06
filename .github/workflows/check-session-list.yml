@@ -34,38 +34,3 @@ jobs:
             sessions.forEach((session) => {
               console.log(session.title);
             });
-            # const issues_response = await github.rest.issues.listForRepo({
-            #   owner: context.repo.owner,
-            #   repo: context.repo.repo,
-            #   state: 'open'
-            # });
-            # const issues = issues.response.data;
-            # const issue_titles = issues.map((issue_json) => {
-            #   return issue_json.title;
-            # });
-            # issue_titles.forEach((issue_title) => {
-            #   console.log(issue_title);
-            # });
-            # var flag = false;
-            # sessions.forEach((session) => {
-            #   if (issues_titles.includes(session.title)) {
-            #     console.log(`セッション${session.title}のissueは既にあるのでスキップ.`);
-            #   } else {
-            #     if (flag) {
-            #       console.log(`セッション${session.title}のissueは無いですが、大量作成防止フラグが立ってるのでスキップ。`);
-            #     } else {
-            #       console.log(`セッション${session.title}のissueを作成します。`);
-            #       await github.rest.issues.create({
-            #         owner: context.repo.owner,
-            #         repo: context.repo.repo,
-            #         title: `[テスト]${session.title}`,
-            #         body: `タイトル: ${session.title}
-            #         URL: ${session.url}
-            #         開始時刻: ${session.start}
-            #         終了時刻: ${session.end}
-            #         登壇者: ${session.speakers.map((speaker) => `${speaker.name}(${speaker.company})`).join()}`
-            #       });
-            #       flag = true;
-            #     }
-            #   }
-            # });
