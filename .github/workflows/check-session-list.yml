@@ -49,31 +49,45 @@ jobs:
                   console.log(`セッション${session.title}のissueは無いですが、大量作成防止フラグが立ってるのでスキップ。`);
                 } else {
                   console.log(`セッション${session.title}のissueを作成します。`);
+                  var date_index;
+                  switch (session.start.split(" ")[0]) {
+                  case "2025/07/22":
+                    date_index = "1日目";
+                    break;
+                  case "2025/07/23":
+                    date_index = "2日目";
+                    break;
+                  case "2025/07/24":
+                    date_index = "3日目";
+                    break;
+                  default:
+                    console.log(`unknown date ${session.start}`);
+                  }
                   await github.rest.issues.create({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     title: `${session.title}`,
                     body: `## セッション情報
-                    | 項目 | 値 |
-                    |:------|:------|
-                    | 日時 | ${session.start} ～ ${session.end.split(" ")[1]} |
-                    | 形式 | $(session.format) |
-                    | 登壇者 | ${session.speakers.map((speaker) => `${speaker.company}　${speaker.name}　様`).join(", ")} |
-                    | カテゴリー | ${session.category} |
-                    | サブカテゴリー | ${session.sub_category.join(", ")} |
-                    | 難易度 | ${session.difficulty} |
-                    | 写真撮影 | ${session.photo_ok ? "可" : "不可" } |
-                    | SNS投稿 | ${session.sns_ok ? "可" : "不可"}
-                    | CEDIL公開予定 | ${session.CEDIL ? "あり" : "なし"} |
-                    | URL | ${session.url} |
-                    
-                    ## 参加ガイドライン
-                    - このセッションに参加するにはリアクションしてください
-                      - 現地で参加したい人は、:rocket:でリアクションしてください
-                      - 家で参加したい人は、:eyes:でリアクションしてください
-                      - 誰かに見て欲しい場合は、:heart:でリアクションしてください
+            | 項目 | 値 |
+            |:------|:------|
+            | 日時 | ${session.start} ～ ${session.end.split(" ")[1]} |
+            | 形式 | ${session.format} |
+            | 登壇者 | ${session.speakers.map((speaker) => `${speaker.company}　${speaker.name}　様`).join(", ")} |
+            | カテゴリー | ${session.category} |
+            | サブカテゴリー | ${session.sub_category.join(", ")} |
+            | 難易度 | ${session.difficulty} |
+            | 写真撮影 | ${session.photo_ok ? "可" : "不可" } |
+            | SNS投稿 | ${session.sns_ok ? "可" : "不可"}
+            | CEDIL公開予定 | ${session.CEDIL ? "あり" : "なし"} |
+            | URL | ${session.URL} |
+            
+            ## 参加ガイドライン
+            - このセッションに参加するにはリアクションしてください
+              - 現地で参加したい人は、:rocket:でリアクションしてください
+              - 家で参加したい人は、:eyes:でリアクションしてください
+              - 誰かに見て欲しい場合は、:heart:でリアクションしてください
                     `,
-                    labels: ["automation"]
+                    labels: [ "automation", session.start.split(" ")[0], date_index, session.format, session.category, session.photo_ok ? "写真撮影可" : "写真撮影不可", session.sns_ok ? "SNS投稿可" : "SNS投稿不可", session.CEDIL ? "CEDIL公開予定あり" : "CEDIL公開予定なし" ].filter(v => v != null)
                   });
                   flag = true;
                 }
