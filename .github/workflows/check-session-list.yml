@@ -54,8 +54,11 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     title: `[テスト]${session.title}`,
-                    body: ``,
-                    labels: 
+                    body: `タイトル: ${session.title}
+                    URL: ${session.url}
+                    開始時刻: ${session.start}
+                    終了時刻: ${session.end}
+                    登壇者: ${session.speakers.map((speaker) => `${speaker.name}(${speaker.company})`).join()}`
                   });
                   flag = true;
                 }
