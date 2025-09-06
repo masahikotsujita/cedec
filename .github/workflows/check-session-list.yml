@@ -45,7 +45,7 @@ jobs:
             const sessions = await cedec_schedule_response.json();
             var flag = false;
             for (const session of sessions) {
-              if (issues_titles.includes(session.title)) {
+              if (issue_titles.includes(session.title)) {
                 console.log(`セッション${session.title}のissueは既にあるのでスキップ.`);
               } else {
                 if (flag) {
