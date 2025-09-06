@@ -30,7 +30,7 @@ jobs:
           script: |
             const cedec_schedule_url = "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json";
             const cedec_schedule_response = await fetch(cedec_schedule_url);
-            const sessions = cedec_schedule_response.json();
+            const sessions = await cedec_schedule_response.json();
             for (const session of sessions) {
               console.log(session.title);
             }
