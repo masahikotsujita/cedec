@@ -37,9 +37,6 @@ jobs:
             const issue_titles = issues.map((issue_json) => {
               return issue_json.title;
             });
-            for (const issue_title of issue_titles) {
-              console.log(issue_title);
-            }
             const cedec_schedule_url = "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json";
             const cedec_schedule_response = await fetch(cedec_schedule_url);
             const sessions = await cedec_schedule_response.json();
@@ -55,11 +52,27 @@ jobs:
                   await github.rest.issues.create({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    title: `[テスト]${session.title}`,
-                    body: `URL: ${session.url}
-                    開始時刻: ${session.start}
-                    終了時刻: ${session.end}
-                    登壇者: ${session.speakers.map((speaker) => `${speaker.name}(${speaker.company})`).join()}`,
+                    title: `${session.title}`,
+                    body: `## セッション情報
+                    | 項目 | 値 |
+                    |:------|:------|
+                    | 日時 | ${session.start} ～ ${session.end.split(" ")[1]} |
+                    | 形式 | $(session.format) |
+                    | 登壇者 | ${session.speakers.map((speaker) => `${speaker.company}　${speaker.name}　様`).join(", ")} |
+                    | カテゴリー | ${session.category} |
+                    | サブカテゴリー | ${session.sub_category.join(", ")} |
+                    | 難易度 | ${session.difficulty} |
+                    | 写真撮影 | ${session.photo_ok ? "可" : "不可" } |
+                    | SNS投稿 | ${session.sns_ok ? "可" : "不可"}
+                    | CEDIL公開予定 | ${session.CEDIL ? "あり" : "なし"} |
+                    | URL | ${session.url} |
+                    
+                    ## 参加ガイドライン
+                    - このセッションに参加するにはリアクションしてください
+                      - 現地で参加したい人は、:rocket:でリアクションしてください
+                      - 家で参加したい人は、:eyes:でリアクションしてください
+                      - 誰かに見て欲しい場合は、:heart:でリアクションしてください
+                    `,
                     labels: ["automation"]
                   });
                   flag = true;
