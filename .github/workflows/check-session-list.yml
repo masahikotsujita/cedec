@@ -29,12 +29,14 @@ jobs:
         with:
           script: |
             const cedec_schedule_url = "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json";
-            const sessions = (await fetch(cedec_schedule_url)).json();
-            const issues = (await github.rest.issues.listForRepo({
+            const cedec_schedule_response = await fetch(cedec_schedule_url);
+            const sessions = cedec_schedule_response.json();
+            const issues_response = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open'
-            })).data;
+            });
+            const issues = issues.response.data;
             const issue_titles = issues.map((issue_json) => {
               return issue_json.title;
             });
