@@ -55,12 +55,9 @@ jobs:
                   await github.rest.issues.create({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    title: `[テスト]${session.title}`,
-                    body: `タイトル: ${session.title}
-                    URL: ${session.url}
-                    開始時刻: ${session.start}
-                    終了時刻: ${session.end}
-                    登壇者: ${session.speakers.map((speaker) => `${speaker.name}(${speaker.company})`).join()}`
+                    title: "テスト",
+                    body: "テスト",
+                    labels] ["automation"]
                   });
                   flag = true;
                 }
