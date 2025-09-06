@@ -33,7 +33,7 @@ jobs:
               repo: context.repo.repo,
               state: 'open'
             });
-            const issues = issues.response.data;
+            const issues = issues_response.data;
             const issue_titles = issues.map((issue_json) => {
               return issue_json.title;
             });
