@@ -57,7 +57,7 @@ jobs:
                     repo: context.repo.repo,
                     title: "テスト",
                     body: "テスト",
-                    labels] ["automation"]
+                    labels: ["automation"]
                   });
                   flag = true;
                 }
