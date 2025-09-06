@@ -22,8 +22,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - name: Get latest cedec session list
-        run: curl -O "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json"
       - name: Create github issues for CEDEC sessions
         uses: actions/github-script@v7
         with:
@@ -40,34 +38,30 @@ jobs:
             const cedec_schedule_url = "https://stat.cedec.cesa.or.jp/assets/json/2025/cedec_schedule.json";
             const cedec_schedule_response = await fetch(cedec_schedule_url);
             const sessions = await cedec_schedule_response.json();
-            var flag = false;
             for (const session of sessions) {
               if (issue_titles.includes(session.title)) {
                 console.log(`セッション${session.title}のissueは既にあるのでスキップ.`);
               } else {
-                if (flag) {
-                  console.log(`セッション${session.title}のissueは無いですが、大量作成防止フラグが立ってるのでスキップ。`);
-                } else {
-                  console.log(`セッション${session.title}のissueを作成します。`);
-                  var date_index;
-                  switch (session.start.split(" ")[0]) {
-                  case "2025/07/22":
-                    date_index = "1日目";
-                    break;
-                  case "2025/07/23":
-                    date_index = "2日目";
-                    break;
-                  case "2025/07/24":
-                    date_index = "3日目";
-                    break;
-                  default:
-                    console.log(`unknown date ${session.start}`);
-                  }
-                  await github.rest.issues.create({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    title: `${session.title}`,
-                    body: `## セッション情報
+                console.log(`セッション${session.title}のissueを作成します。`);
+                var date_index;
+                switch (session.start.split(" ")[0]) {
+                case "2025/07/22":
+                  date_index = "1日目";
+                  break;
+                case "2025/07/23":
+                  date_index = "2日目";
+                  break;
+                case "2025/07/24":
+                  date_index = "3日目";
+                  break;
+                default:
+                  console.log(`unknown date ${session.start}`);
+                }
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `${session.title}`,
+                  body: `## セッション情報
             | 項目 | 値 |
             |:------|:------|
             | 日時 | ${session.start} ～ ${session.end.split(" ")[1]} |
@@ -85,11 +79,8 @@ jobs:
             - このセッションに参加するにはリアクションしてください
               - 現地で参加したい人は、:rocket:でリアクションしてください
               - 家で参加したい人は、:eyes:でリアクションしてください
-              - 誰かに見て欲しい場合は、:heart:でリアクションしてください
-                    `,
-                    labels: [ "automation", session.start.split(" ")[0], date_index, session.format, session.category, session.photo_ok ? "写真撮影可" : "写真撮影不可", session.sns_ok ? "SNS投稿可" : "SNS投稿不可", session.CEDIL ? "CEDIL公開予定あり" : "CEDIL公開予定なし" ].filter(v => v != null)
-                  });
-                  flag = true;
-                }
+              - 誰かに見て欲しい場合は、:heart:でリアクションしてください`,
+                labels: [ "automation", session.start.split(" ")[0], date_index, session.format, session.category, session.photo_ok ? "写真撮影可" : "写真撮影不可", session.sns_ok ? "SNS投稿可" : "SNS投稿不可", session.CEDIL ? "CEDIL公開予定あり" : "CEDIL公開予定なし" ].filter(v => v != null)
+                });
               }
             }
