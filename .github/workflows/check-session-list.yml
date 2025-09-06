@@ -37,7 +37,7 @@ jobs:
             return issuesJson.data;
       - name: Convert issue list to titles
         run: |
-          titles=($(echo '${{ steps.get-github-issues.outputs.result }}' | jq -r '.[].title'))
+          titles=($(echo '${{ steps.get-github-issues.outputs.result }}' | jq -r '.[] | select(.pull_request | not) | .title'))
           echo "${titles[@]}"
       - name: Print cedec session list
         run: |
