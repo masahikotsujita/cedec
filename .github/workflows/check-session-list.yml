@@ -103,7 +103,7 @@ jobs:
               - 誰かに見て欲しい場合は、 :heart: でリアクションしてください`,
                   labels: [ "automation", date_label_simple, date_label_detail, session.format, session.category, session.photo_ok ? "写真撮影可" : "写真撮影不可", session.sns_ok ? "SNS投稿可" : "SNS投稿不可", session.CEDIL ? "CEDIL公開予定あり" : "CEDIL公開予定なし" ].filter(v => v != null)
                   });
-                  issue_create_count += 1;
+                  create_issue_count += 1;
                 } else {
                   console.log(`セッション${session.title}のissueは未作成ですが、1回の作成上限を超えたのでスキップします。`);
                 }
